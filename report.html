@@ -43,7 +43,7 @@
 <div ng-cloak layout="column">
     <md-toolbar ng-class="{'md-warn': results.counts.failed}">
         <div class="md-toolbar-tools">
-            <h2 flex md-truncate>Results <small ng-if="runTime"> - executed in {{runTime}} ms</small></h2>
+            <h2 flex md-truncate>Results for {{results.options.title}}<small ng-if="runTime"> - executed in {{runTime}} ms</small></h2>
             <h6>
                 <span ng-if="results.counts.passed">Passed: {{results.counts.passed}}</span>
                 <br ng-if="results.counts.passed" />
@@ -114,7 +114,9 @@
                 clickOutsideToClose: true
             })
         };
-
+        /*Extras - jcernea*/
+        document.title = results.options.title
+        /*******/
         $scope.results = results;
         $scope.runTime = new Date(results.timer.jasmineDone) - new Date(results.timer.jasmineStart);
 

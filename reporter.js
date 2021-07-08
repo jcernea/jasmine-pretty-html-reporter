@@ -17,6 +17,7 @@ class Reporter {
      * @param {Boolean} options.writeReportEachSpec=true - Write the report between each spec, recommended for long running tests.
      * @param {Boolean} options.showSuspectLine=true - Show suspect line on overview
      * @param {Boolean} options.highlightSuspectLine=true - Highlight the suspect line in the detail dialog
+     * @param {String} options.title - Title to show on report
      */
     constructor(options) {
         this.options = options;
@@ -133,7 +134,9 @@ class Reporter {
         return {
             writeReportEachSpec: true,
             showSuspectLine: true,
-            highlightSuspectLine: true
+            highlightSuspectLine: true,
+            /*Extras - jcernea */
+            title: 'Jasmine Pretty HTML Reporter'
         };
     }
 
