@@ -18,6 +18,7 @@ class Reporter {
      * @param {Boolean} options.showSuspectLine=true - Show suspect line on overview
      * @param {Boolean} options.highlightSuspectLine=true - Highlight the suspect line in the detail dialog
      * @param {String} options.title - Title to show on report
+     * @param {String} options.filename - Name of the report file
      */
     constructor(options) {
         this.options = options;
@@ -34,7 +35,7 @@ class Reporter {
 
         Reporter.makeDirectoryIfNeeded(this.options.path);
 
-        this.destination = path.join(this.options.path, 'report.html');
+        this.destination = path.join(this.options.path, this.options.filename + '.html');
     }
 
     /**
@@ -136,6 +137,7 @@ class Reporter {
             showSuspectLine: true,
             highlightSuspectLine: true,
             /*Extras - jcernea */
+            filename: 'report',
             title: 'Jasmine Pretty HTML Reporter'
         };
     }
