@@ -25,6 +25,7 @@ class Reporter {
         this.sequence = [];
         this.counts = {};
         this.timer = {};
+        this.starts = {}; //Spec start times
 
         this.options = Reporter.getDefaultOptions();
         this.setOptions(options);
@@ -58,7 +59,7 @@ class Reporter {
      * @param {Object} result - Jasmine provided object
      */
     specStarted(result) {
-        result.started = Reporter.nowString();
+        this.starts[result.id] = Reporter.nowString();
     };
 
     /**
@@ -69,7 +70,7 @@ class Reporter {
 
         result.stoped = Reporter.nowString();
         result.prefix = result.fullName.replace(result.description, '');
-        result.duration = new Date(result.stoped) - new Date(result.started);
+        result.duration = new Date(result.stoped) - new Date(this.starts[result.id])
 
         // suspectLine
         result.failedExpectations.forEach(failure => {
