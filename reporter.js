@@ -28,7 +28,7 @@ class Reporter {
         this.counts = {};
         this.timer = {};
         this.starts = {}; //Spec start times
-		this.hasDriver ? capabilities != undefined : false
+
 
         this.options = Reporter.getDefaultOptions();
         this.setOptions(options);
@@ -108,15 +108,36 @@ class Reporter {
 		JSONResult.passed = result.status === 'passed'
 		JSONResult.pending = ['pending', 'disabled', 'excluded'].includes(result.status)
 
-		JSONResult.os = os.type()
-
 		JSONResult.instanceId = process.pid
 		JSONResult.timestamp = new Date(this.starts[result.id]).getTime() 
 		JSONResult.duration = result.duration
 
-		if(this.hasDriver){
+		/* If webdriver is found we can attach extra information */
+		if(typeof browser != 'undefined'){
 			/* Web Driver Specific Information */
-			console.log('Test');
+			const {capabilities, sessionId} = browser
+			JSONResult.os = capabilities.platformName 
+			JSONResult.sessionId = sessionId
+			JSONResult.browser = {name: capabilities.browserName, version: capabilities.browserVersion}
+		}
+
+		if(JSONResult.passed){
+			JSONResult.message = (result.passedExpectations[0] || {}).message || 'Passed'
+			JSONResult.trace = (result.passedExpectations[0] || {}).stack;
+		}else if(JSONResult.pending){
+			JSONResult.message = result.pendingReason || 'Pending'	
+		}else{
+			if(result.failedExpectations[0].message){
+				JSONResult.message = result.failedExpectations.map(result => result.message)
+			}else {
+				JSONResult.message = 'Failed'
+			}
+
+			if(result.failedExpectations[0].stack){
+				JSONResult.trace = result.failedExpectations.map(result => result.stack)
+			}else {
+				JSONResult.trace = 'No Stack trace information'
+			}
 		}
 
 		/* Write JSON file for each spec */
