@@ -208,15 +208,16 @@ class Reporter {
   /* Take screenshots */
   TakeScreenshot(passed, timestamp){
 		const screenshotPath = path.resolve(this.ScreenshotPath, `${timestamp}.png`)
+		const screenshotRelativePath = `Screenshots\\${timestamp}.png`
 
 	if(this.options.screenshotOnFail && !passed){
 		browser.saveScreenshot(screenshotPath)
-		return screenshotPath
+		return screenshotRelativePath
 	}
 
 	if(this.options.screenshotOnSuccess && passed){
 		browser.saveScreenshot(screenshotPath)
-		return screenshotPath
+		return screenshotRelativePath
 	}
 
 	return ''
