@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const os = require('os')
 
 //path setup
 const templatePath = path.join(__dirname, 'report.html');
@@ -19,6 +20,7 @@ class Reporter {
      * @param {Boolean} options.highlightSuspectLine=true - Highlight the suspect line in the detail dialog
      * @param {String} options.title - Title to show on report
      * @param {String} options.filename - Name of the report file
+	 * @param {Boolean} options.saveJson - Save JSON file for each spec
      */
     constructor(options) {
         this.options = options;
@@ -26,6 +28,7 @@ class Reporter {
         this.counts = {};
         this.timer = {};
         this.starts = {}; //Spec start times
+		this.hasDriver ? capabilities != undefined : false
 
         this.options = Reporter.getDefaultOptions();
         this.setOptions(options);
@@ -34,9 +37,17 @@ class Reporter {
             throw new Error('Please provide options.path')
         }
 
-        Reporter.makeDirectoryIfNeeded(this.options.path);
+		Reporter.makeDirectoryIfNeeded(this.options.path)
+		this.options.reportPath = path.resolve(this.options.path, `Test_${Date.now().toString()}`)
+        Reporter.makeDirectoryIfNeeded(this.options.reportPath);
 
-        this.destination = path.join(this.options.path, this.options.filename + '.html');
+        this.destination = path.join(this.options.reportPath, this.options.filename + '.html');
+
+		if(this.options.saveJson){
+			/* We create JSON folder to write JSON files to. */
+			Reporter.makeDirectoryIfNeeded(path.resolve(this.options.reportPath, 'JSON'))
+		}
+
     }
 
     /**
@@ -68,9 +79,9 @@ class Reporter {
      */
     specDone(result) {
 
-        result.stoped = Reporter.nowString();
+        result.stopped = Reporter.nowString();
         result.prefix = result.fullName.replace(result.description, '');
-        result.duration = new Date(result.stoped) - new Date(this.starts[result.id])
+        result.duration = new Date(result.stopped) - new Date(this.starts[result.id])
 
         // suspectLine
         result.failedExpectations.forEach(failure => {
@@ -91,6 +102,27 @@ class Reporter {
         if (this.options.writeReportEachSpec) {
             this.writeFile();
         }
+
+		var JSONResult = {}
+		JSONResult.description = `${result.prefix}|${result.description}`
+		JSONResult.passed = result.status === 'passed'
+		JSONResult.pending = ['pending', 'disabled', 'excluded'].includes(result.status)
+
+		JSONResult.os = os.type()
+
+		JSONResult.instanceId = process.pid
+		JSONResult.timestamp = new Date(this.starts[result.id]).getTime() 
+		JSONResult.duration = result.duration
+
+		if(this.hasDriver){
+			/* Web Driver Specific Information */
+			console.log('Test');
+		}
+
+		/* Write JSON file for each spec */
+		if(this.options.saveJson){
+			fs.writeFileSync(path.resolve(this.options.reportPath, 'JSON/' + JSONResult.timestamp + '.json'), JSON.stringify(JSONResult, null, 4), 'utf8');
+		}
     };
 
     /**
@@ -137,6 +169,7 @@ class Reporter {
             writeReportEachSpec: true,
             showSuspectLine: true,
             highlightSuspectLine: true,
+			saveJson: true,
             /*Extras - jcernea */
             filename: 'report',
             title: 'Jasmine Pretty HTML Reporter'
