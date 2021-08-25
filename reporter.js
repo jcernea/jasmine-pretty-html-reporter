@@ -2,7 +2,6 @@
 
 const fs = require('fs')
 const path = require('path')
-const os = require('os')
 
 //path setup
 const templatePath = path.join(__dirname, 'report.html')
@@ -37,18 +36,21 @@ class Reporter {
       throw new Error('Please provide options.path')
     }
 
-
-
     Reporter.makeDirectoryIfNeeded(this.options.path)
+  }
 
-	/*Paths */
+  /**
+   * Handles jasmine started event
+   * @param {Object} suiteInfo - Jasmine provided object
+   */
+  jasmineStarted(suiteInfo) {
+    /*Generate report folders*/
     this.options.reportPath = path.resolve(
       this.options.path,
       `Test_${Date.now().toString()}`
     )
-	this.JSONPath = path.resolve(this.options.reportPath, 'JSON')
-	this.ScreenshotPath = path.resolve(this.options.reportPath, 'Screenshots')
-
+    this.JSONPath = path.resolve(this.options.reportPath, 'JSON')
+    this.ScreenshotPath = path.resolve(this.options.reportPath, 'Screenshots')
 
     Reporter.makeDirectoryIfNeeded(this.options.reportPath)
 
@@ -59,22 +61,13 @@ class Reporter {
 
     if (this.options.saveJson) {
       /* We create JSON folder to write JSON files to. */
-      Reporter.makeDirectoryIfNeeded(
-		  this.JSONPath
-      )
+      Reporter.makeDirectoryIfNeeded(this.JSONPath)
     }
-
-	if(this.options.screenshotOnSuccess || this.options.screenshotOnFail){
-		/* Make folder for screenshots */
-		Reporter.makeDirectoryIfNeeded(this.ScreenshotPath)
-	}
-  }
-
-  /**
-   * Handles jasmine started event
-   * @param {Object} suiteInfo - Jasmine provided object
-   */
-  jasmineStarted(suiteInfo) {
+    if (this.options.screenshotOnSuccess || this.options.screenshotOnFail) {
+      /* Make folder for screenshots */
+      Reporter.makeDirectoryIfNeeded(this.ScreenshotPath)
+    }
+    /* Generate Folders End */
     this.timer.jasmineStart = Reporter.nowString()
   }
 
@@ -136,9 +129,12 @@ class Reporter {
 
     /* If webdriver is found we can attach extra information */
     if (typeof browser != 'undefined') {
-	  /* Screenshot Test */
-	  const screenshotLocation = this.TakeScreenshot(JSONResult.passed, JSONResult.timestamp)
-	  JSONResult.screenshotFile = screenshotLocation
+      /* Screenshot Test */
+      const screenshotLocation = this.TakeScreenshot(
+        JSONResult.passed,
+        JSONResult.timestamp
+      )
+      JSONResult.screenshotFile = screenshotLocation
       /* Web Driver Specific Information */
       const { capabilities, sessionId } = browser
       JSONResult.os = capabilities.platformName
@@ -176,9 +172,7 @@ class Reporter {
     /* Write JSON file for each spec */
     if (this.options.saveJson) {
       fs.writeFileSync(
-        path.resolve(
-          this.JSONPath, JSONResult.timestamp + '.json'
-        ),
+        path.resolve(this.JSONPath, JSONResult.timestamp + '.json'),
         JSON.stringify(JSONResult, null, 4),
         'utf8'
       )
@@ -206,22 +200,21 @@ class Reporter {
   }
 
   /* Take screenshots */
-  TakeScreenshot(passed, timestamp){
-		const screenshotPath = path.resolve(this.ScreenshotPath, `${timestamp}.png`)
-		const screenshotRelativePath = `Screenshots\\${timestamp}.png`
+  TakeScreenshot(passed, timestamp) {
+    const screenshotPath = path.resolve(this.ScreenshotPath, `${timestamp}.png`)
+    const screenshotRelativePath = `Screenshots\\${timestamp}.png`
 
-	if(this.options.screenshotOnFail && !passed){
-		browser.saveScreenshot(screenshotPath)
-		return screenshotRelativePath
-	}
+    if (this.options.screenshotOnFail && !passed) {
+      browser.saveScreenshot(screenshotPath)
+      return screenshotRelativePath
+    }
 
-	if(this.options.screenshotOnSuccess && passed){
-		browser.saveScreenshot(screenshotPath)
-		return screenshotRelativePath
-	}
+    if (this.options.screenshotOnSuccess && passed) {
+      browser.saveScreenshot(screenshotPath)
+      return screenshotRelativePath
+    }
 
-	return ''
-
+    return ''
   }
 
   /** writes the report html to the options.path **/
