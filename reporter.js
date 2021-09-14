@@ -13,6 +13,7 @@ class Reporter {
    * @constructor
    * @param {Object} options - options for the reporter
    * @param {String} options.path - Path the report.html will be written to
+   * @param {String} options.testFolderName - Name of the folder that will be generated for currently running suite. Make it dynamic to avoid overwriting tests.
    * @param {Boolean} options.writeReportEachSpec=true - Write the report between each spec, recommended for long running tests.
    * @param {Boolean} options.showSuspectLine=true - Show suspect line on overview
    * @param {Boolean} options.highlightSuspectLine=true - Highlight the suspect line in the detail dialog
@@ -47,7 +48,7 @@ class Reporter {
     /*Generate report folders*/
     this.options.reportPath = path.resolve(
       this.options.path,
-      `Test_${Date.now().toString()}`
+      this.options.testFolderName
     )
     this.JSONPath = path.resolve(this.options.reportPath, 'JSON')
     this.ScreenshotPath = path.resolve(this.options.reportPath, 'Screenshots')
@@ -248,6 +249,7 @@ class Reporter {
       saveJson: true,
       screenshotOnFail: true,
       screenshotOnSuccess: true,
+	  testFolderName: 'Tests'
     }
   }
 

@@ -35,9 +35,10 @@ _ALSO: Reporter now reads into browser object and if it's defined it provides ad
 
 | Name                | Type    | Default | Description                                                                                  |
 | ------------------- | ------- | ------- | -------------------------------------------------------------------------------------------- |
-| path                | String  |         | path the report.html will be written to (required)                                           |
-| writeReportEachSpec | Boolean | true    | writes the report.html after each spec completes, this is recommended for long running tests |
-| showSuspectLine     | Boolean | true    | shows "suspect line" on overview                                                             |
+| path                | String  |         | Path the report.html will be written to (required)                                           |
+| testFolderName      | String  |         | Name of the folder that will be generated for currently running suite.                       |
+| writeReportEachSpec | Boolean | true    | Writes the report.html after each spec completes, this is recommended for long running tests |
+| showSuspectLine     | Boolean | true    | Shows "suspect line" on overview                                                             |
 | Title               | String  |         | Set title for HTML report                                                                    |
 | filename            | String  | true    | Filename of the HTML report                                                                  |
 | saveJSON            | Boolean | true    | Exports JSON file for each spec                                                              |
